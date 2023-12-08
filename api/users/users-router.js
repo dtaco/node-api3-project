@@ -51,5 +51,14 @@ router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
   console.log(req.text)
 });
 
+
+router.use((err, req, res, next) => { //eslint-disable-line
+  res.status(err.status || 500).json({
+    customMessage:'something trafic inside posts router happened',
+    err: err.message,
+    stack: err.stack,
+  })
+})
+
 // do not forget to export the router
 module.exports = router
