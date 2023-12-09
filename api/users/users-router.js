@@ -44,28 +44,39 @@ router.delete('/:id', validateUserId, async (req, res, next) => {
     await User.remove(req.params.id)
     res.json(req.user);
   } catch (err) {
-    next(err)
+      next(err)
   }
 });
 
-router.get('/:id/posts', validateUserId, (req, res) => {
-  // RETURN THE ARRAY OF USER POSTS
-  // this needs a middleware to verify user id
-
+router.get('/:id/posts', validateUserId, async (req, res, next) => {
+  try {
+    const result = await User.getUserPosts(req.params.id)
+    res.json(result)
+  } catch (err) {
+      next(err)
+  }
 });
 
-router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
-  // RETURN THE NEWLY CREATED USER POST
-  // this needs a middleware to verify user id
-  // and another middleware to check that the request body is valid
-  console.log(req.user)
-  console.log(req.text)
+router.post(
+  '/:id/posts', 
+  validateUserId, 
+  validatePost, 
+  async (req, res, next) => {
+    try {
+      const result = await Post.insert({
+        user_id: req.params.id,
+        text: req.text,
+      })
+      res.json(result)
+    } catch (err) {
+        next(err)
+    }
 });
 
 
 router.use((err, req, res, next) => { //eslint-disable-line
   res.status(err.status || 500).json({
-    customMessage:'something trafic inside posts router happened',
+    customMessage:'something tragic inside posts router happened',
     err: err.message,
     stack: err.stack,
   })
